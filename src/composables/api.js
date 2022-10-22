@@ -5,12 +5,15 @@ export function useApi(factory, handleResponse) {
   const result = ref(null);
   const error = ref(null);
   const execute = async (...args) => {
+    const headers = {
+      "Content-Type": "application/strategic-merge-patch+json",
+    };
     const { url, ...request } = factory(...args);
 
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await fetch(url, request);
+      const response = await fetch(url, { ...request, headers });
       const valueResponse = await handleResponse(response);
 
       if (String(response.status)[0] !== "2") {

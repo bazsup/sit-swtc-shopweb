@@ -1,1 +1,1 @@
-export const BASE_URL = "http://shop-api.sit.tnpl.me";
+export const BASE_URL = import.meta.env.VITE_API_URL;

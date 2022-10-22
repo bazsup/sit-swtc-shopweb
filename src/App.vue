@@ -22,7 +22,7 @@ function logAppVersion() {
           class="flex justify-start lg:w-0 flex-1"
           @dblclick="logAppVersion()"
         >
-          <RouterLink to="/"> KMUTT Shop </RouterLink>
+          <RouterLink to="/"> ODDS Shop </RouterLink>
         </div>
 
         <div>
