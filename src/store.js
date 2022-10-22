@@ -17,10 +17,10 @@ export function addNumberOfItems(amount) {
 }
 
 export function initCart() {
+  store.cartId = sessionStorage.getItem("cartId") ?? "";
+  setNumberOfItems(Number(sessionStorage.getItem("numberOfItems") ?? 0));
   if (store.cartId === "") {
     store.cartId = uuidv4();
     sessionStorage.setItem("cartId", store.cartId);
-
-    setNumberOfItems(Number(sessionStorage.getItem("numberOfItems") ?? 0));
   }
 }

@@ -23,3 +23,13 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+// eslint-disable-next-line no-unused-vars
+/* global Cypress, expect, cy */
+
+Cypress.Commands.add(
+  "shouldHaveText",
+  { prevSubject: true },
+  (subject, equalTo) => {
+    expect(subject.text().trim()).to.equal(equalTo);
+  }
+);

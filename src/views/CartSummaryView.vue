@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref, reactive } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { useApi } from "@/composables/api";
-import { getCartSummary, applyCoupon } from "@/services/cart";
+import { applyCoupon, getCartSummary } from "@/services/cart";
 import { store } from "@/store";
 import { decimalFormat } from "@/tools/decimalFormat";
 
@@ -28,10 +28,11 @@ async function applyForCoupon() {
   if (couponApply.result.value !== null) {
     coupon.description = couponApply.result.value.description;
     coupon.valid = true;
-  } else if (couponApply.error.value.code === "400") {
+  } else if (String(couponApply.error.value.code) === "400") {
     coupon.description = couponApply.error.value.message;
     coupon.valid = false;
   }
+  cartSummary.execute(store.cartId);
 }
 </script>
 
@@ -64,16 +65,20 @@ async function applyForCoupon() {
             <tr
               v-for="(item, index) in cartSummary.result.value.lineItems"
               :key="index"
+              data-cy="cart-summary-item"
             >
               <td>
                 <a href="#">
-                  <p class="mb-2 md:ml-4">{{ item.name }}</p>
+                  <p data-cy="cart-summary-item--name" class="mb-2 md:ml-4">
+                    {{ item.name }}
+                  </p>
                 </a>
               </td>
               <td class="justify-center md:justify-end md:flex">
                 <div class="w-20 h-10">
                   <div class="relative flex flex-row w-full h-8">
                     <input
+                      data-cy="cart-summary-item--quantity"
                       type="number"
                       :value="item.quantity"
                       readonly
@@ -83,13 +88,17 @@ async function applyForCoupon() {
                 </div>
               </td>
               <td class="hidden text-right md:table-cell">
-                <span class="text-sm lg:text-base font-medium"
-                  >฿{{ decimalFormat(item.unitPrice) }}</span
+                <span
+                  data-cy="cart-summary-item--unit-price"
+                  class="text-sm lg:text-base font-medium"
+                  >${{ decimalFormat(item.unitPrice) }}</span
                 >
               </td>
               <td class="text-right">
-                <span class="text-sm lg:text-base font-medium"
-                  >฿{{ decimalFormat(item.quantity * item.unitPrice) }}</span
+                <span
+                  data-cy="cart-summary-item--total-price"
+                  class="text-sm lg:text-base font-medium"
+                  >${{ decimalFormat(item.quantity * item.unitPrice) }}</span
                 >
               </td>
             </tr>
@@ -101,16 +110,22 @@ async function applyForCoupon() {
             <div class="lg:px-2 lg:py-2 md:ml-2 text-center text-gray-800">
               Subtotal
             </div>
-            <div class="lg:py-2 text-center text-gray-900">
-              ฿{{ decimalFormat(cartSummary.result.value.subtotal) }}
+            <div class="lg:py-2 text-center text-gray-900" data-cy="subtotal">
+              ${{ decimalFormat(cartSummary.result.value.subtotal) }}
             </div>
           </div>
           <div class="flex justify-between">
-            <div class="lg:px-2 lg:py-2 md:ml-2 text-center text-gray-800">
+            <div
+              class="lg:px-2 lg:py-2 md:ml-2 text-center text-gray-800"
+              data-cy="discount-name"
+            >
               Discount: {{ cartSummary.result.value.discountName }}
             </div>
-            <div class="lg:py-2 text-center text-gray-900">
-              -฿{{ decimalFormat(cartSummary.result.value.discountAmount) }}
+            <div
+              class="lg:py-2 text-center text-gray-900"
+              data-cy="discount-amount"
+            >
+              -${{ decimalFormat(cartSummary.result.value.discountAmount) }}
             </div>
           </div>
           <div class="flex justify-between">
@@ -119,8 +134,11 @@ async function applyForCoupon() {
             >
               Total
             </div>
-            <div class="lg:py-2 text-center font-bold text-gray-900">
-              ฿{{ decimalFormat(cartSummary.result.value.total) }}
+            <div
+              class="lg:py-2 text-center font-bold text-gray-900"
+              data-cy="total"
+            >
+              ${{ decimalFormat(cartSummary.result.value.total) }}
             </div>
           </div>
         </div>
@@ -131,11 +149,7 @@ async function applyForCoupon() {
             </div>
             <div class="p-2 lg:w-1/2">
               <div class="">
-                <form
-                  action=""
-                  method="POST"
-                  @submit.prevent="applyForCoupon()"
-                >
+                <form @submit.prevent="applyForCoupon()">
                   <div
                     class="flex items-center w-full h-12 pl-3 bg-white bg-gray-100 border rounded-full"
                   >
@@ -146,10 +160,12 @@ async function applyForCoupon() {
                       placeholder="Apply coupon"
                       v-model="userCoupon"
                       class="w-full bg-gray-100 outline-none appearance-none focus:outline-none active:outline-none"
+                      data-cy="coupon-code"
                     />
                     <button
                       type="submit"
                       class="text-sm flex items-center px-4 h-full text-white bg-gray-800 rounded-full outline-none md:px-4 hover:bg-gray-700 focus:outline-none active:outline-none"
+                      data-cy="apply-coupon-button"
                     >
                       <svg
                         aria-hidden="true"
@@ -175,9 +191,10 @@ async function applyForCoupon() {
             class="p-4 mt-1 rounded-md md:mx-4 border-dashed border-2 border-gray-500 pl-6"
             :class="{ 'bg-cyan-50': coupon.valid, 'bg-red-50': !coupon.valid }"
             v-if="coupon.description"
+            data-cy="coupon-detail"
           >
             <p>Description</p>
-            <p>{{ coupon.description }}</p>
+            <p data-cy="coupon-description">{{ coupon.description }}</p>
           </div>
         </div>
       </div>
